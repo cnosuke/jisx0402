@@ -1,4 +1,4 @@
-#require "jisx0402/version"
+require "jisx0402/version"
 require 'csv'
 
 module Jisx0402
@@ -57,8 +57,9 @@ module Jisx0402
     def full(hiragana: false)
       hiragana ? @row[6] : @row[5]
     end
+
+    def first
+      self #compatible for Array#first
+    end
   end
 end
-
-require 'pry'
-pry
