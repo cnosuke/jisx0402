@@ -33,7 +33,7 @@ module Jisx0402
     end
 
     def data
-      @@data ||= CSV.parse(open(File.expand_path('../data/data.csv', __FILE__)).read)
+      @@data ||= CSV.parse(open(File.expand_path('../data/data.csv', __FILE__), 'r:UTF-8').read)
     end
   end
 
