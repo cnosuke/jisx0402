@@ -1,5 +1,6 @@
 require "jisx0402/version"
-require 'csv'
+require 'jisx0402/district_array'
+require 'msgpack'
 
 module Jisx0402
   class << self
@@ -17,7 +18,9 @@ module Jisx0402
         if result.size == 1
           return Code.new(result.first)
         else
-          return result.map{|r| Code.new(r) }
+          Jisx0402::DistrictArray.wrap(
+            result.map{|r| Code.new(r) }
+          )
         end
       else
         result = way.map do |w|
@@ -27,13 +30,23 @@ module Jisx0402
         if result.size == 1
           return result.first
         else
-          return result
+          return Jisx0402::DistrictArray.wrap(result)
         end
       end
     end
 
     def data
-      @@data ||= CSV.parse(open(File.expand_path('../data/data.csv', __FILE__), 'r:UTF-8').read)
+      @@data ||= open_msgpack_data('jisx0402.msgpack')
+    end
+
+    def zipcodes_table
+      @@zipcodes_table ||= open_msgpack_data('jisx0402_to_zipcode.msgpack')
+    end
+
+    def open_msgpack_data(fname)
+      MessagePack.unpack(
+        open(File.expand_path("../data/#{fname}", __FILE__)).read
+      )
     end
   end
 
@@ -44,6 +57,10 @@ module Jisx0402
 
     def code
       @row[0]
+    end
+
+    def code_without_checkdigit
+      @row[0][0..-2]
     end
 
     def prefecture(hiragana: false)
@@ -60,6 +77,10 @@ module Jisx0402
 
     def first
       self #compatible for Array#first
+    end
+
+    def zipcodes
+      Jisx0402.zipcodes_table[code_without_checkdigit]
     end
   end
 end
