@@ -1,11 +1,11 @@
 class Jisx0402::DistrictArray < Array
   def self.wrap(ary)
     this = new
-    ary.map{|e| this << ary }
+    ary.flatten.map{|e| this << e }
     return this
   end
 
   def zipcodes
-    self.flatten.map(&:zipcodes).flatten.uniq
+    self.map(&:zipcodes).flatten.uniq.compact
   end
 end

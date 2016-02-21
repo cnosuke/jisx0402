@@ -1,29 +1,42 @@
 require 'spec_helper'
 
 describe Jisx0402 do
-  it 'has a version number' do
+  it "has a version number" do
     expect(Jisx0402::VERSION).not_to be nil
   end
 
   let(:shibuya_code) { "131130" }
 
-  it 'can find 東京都渋谷区' do
-    expect(Jisx0402.search('東京都渋谷区').code).to eq(shibuya_code)
+  it ".search('東京都渋谷区')" do
+    expect(Jisx0402.search("東京都渋谷区").code).to eq(shibuya_code)
   end
 
-  it 'can find 渋谷区' do
+  it ".forward_match_by_full(東京都渋谷区)" do
+    expect(Jisx0402.forward_match_by_full("東京都渋谷区").first.code).to eq(shibuya_code)
+  end
+
+  it ".forward_match_by_code('131130')" do
+    expect(Jisx0402.forward_match_by_code("131130").first.code).to eq(shibuya_code)
+  end
+
+  it ".forward_match_by_code('13')" do
+    expect(Jisx0402.forward_match_by_code("13").zipcodes.size).to eq(3805)
+    expect(Jisx0402.forward_match_by_code("13").map(&:prefecture).uniq).to eq(['東京都'])
+  end
+
+  it ".search('渋谷区')" do
     expect(Jisx0402.search('渋谷区').code).to eq(shibuya_code)
   end
 
-  it 'can find しぶや' do
+  it ".search('しぶや')" do
     expect(Jisx0402.search('しぶや').code).to eq(shibuya_code)
   end
 
-  it 'has code without checkdigit' do
+  it ".search('しぶや').code_without_checkdigit" do
     expect(Jisx0402.search('しぶや').code_without_checkdigit).to eq(shibuya_code[0..-2])
   end
 
-  it 'has zipcodes including 渋谷区' do
+  it ".search('渋谷区').zipcodes" do
     expect(Jisx0402.search('渋谷区').zipcodes).to eq(
       [
         "1500000", "1510064", "1500032", "1500042", "1500013", "1506090",
@@ -43,7 +56,14 @@ describe Jisx0402 do
     )
   end
 
-  it 'has zipcodes including 東京都' do
-    expect(Jisx0402.search('東京都').zipcodes.size).to eq(3806)
+  it ".search('東京都').zipcodes" do
+    expect(Jisx0402.search('東京都').zipcodes.size).to eq(3805)
+  end
+
+  it ".match_by_zipcode" do
+    expect(Jisx0402.match_by_zipcode('1506012').code).to eq('131130')
+    expect(Jisx0402.match_by_zipcode('1506022').code).to eq('131130')
+    expect(Jisx0402.match_by_zipcode('1500033').code).to eq('131130')
+    expect(Jisx0402.match_by_zipcode('1500044').code).to eq('131130')
   end
 end
