@@ -2,7 +2,6 @@ require "jisx0402/version"
 require 'jisx0402/district_array'
 require 'jisx0402/tree'
 require 'msgpack'
-require 'pry'
 
 module Jisx0402
   class << self
