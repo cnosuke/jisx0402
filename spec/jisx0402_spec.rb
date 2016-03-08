@@ -1,6 +1,8 @@
 require 'spec_helper'
 
 describe Jisx0402 do
+  before { Jisx0402.warmup }
+
   it "has a version number" do
     expect(Jisx0402::VERSION).not_to be nil
   end

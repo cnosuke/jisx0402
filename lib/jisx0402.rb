@@ -2,6 +2,7 @@ require "jisx0402/version"
 require 'jisx0402/district_array'
 require 'jisx0402/tree'
 require 'msgpack'
+require 'json'
 
 module Jisx0402
   class << self
@@ -42,7 +43,7 @@ module Jisx0402
     end
 
     def data
-      @@data ||= open_msgpack_data('jisx0402.msgpack').map do |d|
+      @@data ||= open_data('jisx0402').map do |d|
         Code.new(d)
       end
     end
@@ -69,13 +70,33 @@ module Jisx0402
     end
 
     def jisx0402_to_zipcode_table
-      @@jisx0402_to_zipcode_table ||= open_msgpack_data('jisx0402_to_zipcode.msgpack')
+      @@jisx0402_to_zipcode_table ||= open_data('jisx0402_to_zipcode')
+    end
+
+    def open_data(fname)
+      if Gem::Version.new(MessagePack::VERSION) > Gem::Version.new('0.5.11')
+        open_msgpack_data("#{fname}.msgpack")
+      else
+        open_json_data("#{fname}.json")
+      end
+    end
+
+    def open_json_data(fname)
+      JSON.parse(
+        open(File.expand_path("../data/#{fname}", __FILE__)).read
+      )
     end
 
     def open_msgpack_data(fname)
       MessagePack.unpack(
         open(File.expand_path("../data/#{fname}", __FILE__)).read
       )
+    end
+
+    def warmup
+      match_by_zipcode('0')
+      forward_match_by_full('東')
+      true
     end
   end
 
@@ -127,3 +148,5 @@ module Jisx0402
     end
   end
 end
+
+Jisx0402.warmup
