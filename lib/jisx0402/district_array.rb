@@ -8,4 +8,8 @@ class Jisx0402::DistrictArray < Array
   def zipcodes
     self.map(&:zipcodes).flatten.uniq.compact
   end
+
+  def codes
+    self.map(&:code).flatten.uniq.compact
+  end
 end

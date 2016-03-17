@@ -124,7 +124,30 @@ module Jisx0402
     end
 
     def code_without_checkdigit
-      @row[0][0..-2]
+      code[0..-2]
+    end
+
+    def district_code
+      @district_code ||= code[2..4]
+    end
+
+    def prefecture?
+      district_code == '000'.freeze
+    end
+
+    GOVERNMENT_ORDINANCE_DESIGNATED_CITY_CODE_LIST = %(100 130 140 150).freeze
+    def government_ordinance_designated_city?
+      @government_ordinance_designated_city ||= begin
+        GOVERNMENT_ORDINANCE_DESIGNATED_CITY_CODE_LIST.include?(district_code)
+      end
+    end
+
+    def ward?
+      @ward ||= (100..199).cover?(district_code.to_i)
+    end
+
+    def prefecture_code
+      code[0..1]
     end
 
     def prefecture(hiragana: false)
@@ -146,7 +169,19 @@ module Jisx0402
     def zipcodes
       Jisx0402.jisx0402_to_zipcode_table[code_without_checkdigit] || []
     end
+
+    def cover?(c)
+      area_code = c.to_s
+      if prefecture?
+        area_code.start_with?(prefecture_code)
+      elsif government_ordinance_designated_city?
+        Jisx0402.forward_match_by_full(full).codes.include?(area_code)
+      else
+        code == area_code
+      end
+    end
   end
 end
 
+# Warmpup zipcodes converting table and district codes tree cache.
 Jisx0402.warmup
