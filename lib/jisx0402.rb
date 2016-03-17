@@ -11,6 +11,17 @@ module Jisx0402
       data
     end
 
+    def find_by_code(c)
+      code = c.to_s
+      if code.size == 2 && (1..47).cover?(code.to_i)
+        code_without_checkdigit = "#{code}000" # 都道府県
+      else
+        code_without_checkdigit = code[0..4] # Eliminate checkdigit
+      end
+
+      jisx0402_without_checkdigit_table[code_without_checkdigit]
+    end
+
     def forward_match_by_full(chunk)
       forward_match_by(:full, chunk)
     end
@@ -66,6 +77,12 @@ module Jisx0402
 
           hash
         end
+      end
+    end
+
+    def jisx0402_without_checkdigit_table
+      @jisx0402_table ||= begin
+        data.map{ |d| [d.code_without_checkdigit, d] }.to_h
       end
     end
 

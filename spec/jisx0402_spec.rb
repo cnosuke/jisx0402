@@ -70,6 +70,35 @@ describe Jisx0402 do
     expect(Jisx0402.match_by_zipcode('1500044').code).to eq('131130')
   end
 
+  describe ".find_by_code" do
+    let(:code) { '' }
+    subject do
+      Jisx0402.find_by_code(code)
+    end
+
+    context "131130 is 渋谷区" do
+      let(:code) { '131130' }
+      it { expect(subject).to eq(Jisx0402.forward_match_by_code(code).first)}
+    end
+
+    context "13113(w/o checkdigit) is 渋谷区" do
+      let(:code) { '13113' }
+      it { expect(subject).to eq(Jisx0402.forward_match_by_code('131130').first)}
+    end
+
+    context "13 is 東京都" do
+      let(:code) { '13' }
+      it { expect(subject).to eq(Jisx0402.forward_match_by_code(code).first)}
+      it { expect(subject.prefecture?).to be_truthy }
+    end
+
+    context "130001 is also 東京都" do
+      let(:code) { '130001' }
+      it { expect(subject).to eq(Jisx0402.forward_match_by_code(code).first)}
+      it { expect(subject.prefecture?).to be_truthy }
+    end
+  end
+
   describe "#prefecture?" do
     let(:area) { '' }
     subject do
