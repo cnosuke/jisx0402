@@ -97,6 +97,11 @@ describe Jisx0402 do
       it { expect(subject).to eq(Jisx0402.forward_match_by_code(code).first)}
       it { expect(subject.prefecture?).to be_truthy }
     end
+
+    context 'nil or blank returns nil' do
+      it { expect(Jisx0402.find_by_code(nil)).to be_nil }
+      it { expect(Jisx0402.find_by_code('')).to be_nil }
+    end
   end
 
   describe "#prefecture?" do
@@ -171,6 +176,8 @@ describe Jisx0402 do
       it { expect(subject.cover?(tsurumi_ward_code)).to be_truthy }
       it { expect(subject.cover?(kawasaki_city_code)).to be_truthy }
       it { expect(subject.cover?(shibuya_code)).to be_falsey }
+      it { expect(subject.cover?(nil)).to be_falsey }
+      it { expect(subject.cover?('')).to be_falsey }
     end
 
     context '鶴見区 is a part of 横浜市, but 川崎区 is not.' do
@@ -178,6 +185,8 @@ describe Jisx0402 do
       it { expect(subject.cover?(tsurumi_ward_code)).to be_truthy }
       it { expect(subject.cover?(kawasaki_ward_code)).to be_falsey }
       it { expect(subject.cover?(shibuya_code)).to be_falsey }
+      it { expect(subject.cover?(nil)).to be_falsey }
+      it { expect(subject.cover?('')).to be_falsey }
     end
 
     context '川崎市 is not a part of 横浜市' do
@@ -189,6 +198,8 @@ describe Jisx0402 do
       let(:area) { tsurumi_ward_code }
       it { expect(subject.cover?(tsurumi_ward_code)).to be_truthy }
       it { expect(subject.cover?(kawasaki_ward_code)).to be_falsey }
+      it { expect(subject.cover?(nil)).to be_falsey }
+      it { expect(subject.cover?('')).to be_falsey }
     end
   end
 end

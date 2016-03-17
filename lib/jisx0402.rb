@@ -12,6 +12,8 @@ module Jisx0402
     end
 
     def find_by_code(c)
+      return nil if !c || c.size == 0
+
       code = c.to_s
       if code.size == 2 && (1..47).cover?(code.to_i)
         code_without_checkdigit = "#{code}000" # 都道府県
@@ -188,6 +190,8 @@ module Jisx0402
     end
 
     def cover?(c)
+      return false if !c || c.size == 0
+
       area_code = c.to_s
       if prefecture?
         area_code.start_with?(prefecture_code)
