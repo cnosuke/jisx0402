@@ -73,8 +73,9 @@ module Jisx0402
     def zipcode_to_jisx0402_table
       @@zipcode_to_jisx0402_table ||= begin
         jisx0402_to_zipcode_table.map.with_object({}) do |(jisx0402, zipcodes), hash|
+          elem = forward_match_by_code(jisx0402).first
           zipcodes.map do |zipcode|
-            hash[zipcode] = forward_match_by_code(jisx0402).first
+            hash[zipcode] = elem
           end
 
           hash
