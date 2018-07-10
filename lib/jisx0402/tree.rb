@@ -46,7 +46,7 @@ class Jisx0402::Tree
     end
 
     def values
-      [value, @data.values.map(&:values)].flatten.compact
+      [value, *@data.values.map(&:values)].compact
     end
   end
 end
